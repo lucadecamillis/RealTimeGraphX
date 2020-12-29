@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 
 namespace RealTimeGraphX.WPF
 {
@@ -14,30 +9,11 @@ namespace RealTimeGraphX.WPF
     /// <seealso cref="RealTimeGraphX.IGraphDataSeries" />
     public class WpfGraphDataSeries : GraphObject, IGraphDataSeries
     {
-        #region Internal Properties
-
-        /// <summary>
-        /// Gets the GDI stroke color.
-        /// </summary>
-        internal System.Drawing.Color GdiStroke { get; private set; }
-
-        /// <summary>
-        /// Gets the GDI fill brush.
-        /// </summary>
-        internal System.Drawing.Brush GdiFill { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the GDI pen.
-        /// </summary>
-        internal System.Drawing.Pen GdiPen { get; set; }
-
-        #endregion
-
-        private String _name;
+        private string _name;
         /// <summary>
         /// Gets or sets the series name.
         /// </summary>
-        public String Name
+        public string Name
         {
             get { return _name; }
             set { _name = value; RaisePropertyChangedAuto(); }
@@ -56,7 +32,6 @@ namespace RealTimeGraphX.WPF
             set
             {
                 _strokeThickness = value;
-                GdiPen = new System.Drawing.Pen(GdiStroke, _strokeThickness);
                 RaisePropertyChangedAuto();
             }
         }
@@ -82,16 +57,6 @@ namespace RealTimeGraphX.WPF
             {
                 _stroke = value;
                 RaisePropertyChangedAuto();
-
-                if (_stroke != null)
-                {
-                    GdiStroke = _stroke.ToGdiColor();
-                    GdiPen = new System.Drawing.Pen(GdiStroke, StrokeThickness);
-                }
-                else
-                {
-                    GdiStroke = System.Drawing.Color.Transparent;
-                }
             }
         }
 
@@ -106,15 +71,6 @@ namespace RealTimeGraphX.WPF
             {
                 _fill = value;
                 RaisePropertyChangedAuto();
-
-                if (_fill != null)
-                {
-                    GdiFill = _fill.ToGdiBrush();
-                }
-                else
-                {
-                    GdiFill = null;
-                }
             }
         }
 

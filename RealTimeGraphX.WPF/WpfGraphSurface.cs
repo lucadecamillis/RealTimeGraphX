@@ -24,10 +24,6 @@ namespace RealTimeGraphX.WPF
     /// <seealso cref="RealTimeGraphX.IGraphSurface{RealTimeGraphX.WPF.WpfGraphDataSeries}" />
     public class WpfGraphSurface : Control, IGraphSurface<WpfGraphDataSeries>
     {
-        private WriteableBitmap _writeable_bitmap;
-        private System.Drawing.Bitmap _gdi_bitmap;
-        private System.Drawing.Graphics _g;
-
         private bool _size_changed;
         private System.Drawing.SizeF _size;
         private System.Drawing.RectangleF _zoom_rect;
@@ -40,6 +36,8 @@ namespace RealTimeGraphX.WPF
         private Point _current_mouse_position;
         private Point _last_mouse_position;
         private Grid _grid;
+
+        readonly IBitmapGenerator bitmapGenerator;
 
         #region Events
 
@@ -97,6 +95,8 @@ namespace RealTimeGraphX.WPF
         public WpfGraphSurface()
         {
             SizeChanged += WpfGraphSurface_SizeChanged;
+
+            this.bitmapGenerator = new Generators.GdiGenerator();
         }
 
         #endregion
@@ -283,24 +283,12 @@ namespace RealTimeGraphX.WPF
         /// </summary>
         public void BeginDraw()
         {
+            this.bitmapGenerator.BeginDraw(_size, _size_changed);
+
             if (_size_changed)
             {
-                _writeable_bitmap = new WriteableBitmap((int)Math.Max(_size.Width, 1), (int)Math.Max(_size.Height, 1), 96.0, 96.0, PixelFormats.Pbgra32, null);
-
-                _gdi_bitmap = new System.Drawing.Bitmap(_writeable_bitmap.PixelWidth, _writeable_bitmap.PixelHeight,
-                                             _writeable_bitmap.BackBufferStride,
-                                             System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
-                                             _writeable_bitmap.BackBuffer);
-
                 _size_changed = false;
             }
-
-            _writeable_bitmap.Lock();
-
-            _g = System.Drawing.Graphics.FromImage(_gdi_bitmap);
-            _g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-            _g.Clear(System.Drawing.Color.Transparent);
         }
 
         /// <summary>
@@ -309,8 +297,7 @@ namespace RealTimeGraphX.WPF
         /// <param name="transform">The transform.</param>
         public void SetTransform(GraphTransform transform)
         {
-            _g.TranslateTransform((float)transform.TranslateX, (float)transform.TranslateY);
-            _g.ScaleTransform((float)transform.ScaleX, (float)transform.ScaleY);
+            this.bitmapGenerator.SetTransform(transform);
         }
 
         /// <summary>
@@ -320,10 +307,7 @@ namespace RealTimeGraphX.WPF
         /// <param name="points">The points.</param>
         public void DrawSeries(WpfGraphDataSeries dataSeries, IEnumerable<System.Drawing.PointF> points)
         {
-            GraphicsPath path = new GraphicsPath();
-            path.AddLines(points.ToArray());
-            _g.DrawPath(dataSeries.GdiPen, path);
-            path.Dispose();
+            this.bitmapGenerator.DrawSeries(dataSeries, points);
         }
 
         /// <summary>
@@ -333,16 +317,7 @@ namespace RealTimeGraphX.WPF
         /// <param name="points">The points.</param>
         public void FillSeries(WpfGraphDataSeries dataSeries, IEnumerable<System.Drawing.PointF> points)
         {
-            var brush = dataSeries.GdiFill;
-
-            if (dataSeries.GdiFill is System.Drawing.Drawing2D.LinearGradientBrush)
-            {
-                var gradient = dataSeries.GdiFill as System.Drawing.Drawing2D.LinearGradientBrush;
-                gradient.ResetTransform();
-                gradient.ScaleTransform((_size.Width / gradient.Rectangle.Width), (_size.Height / gradient.Rectangle.Height));
-            }
-
-            _g.FillPolygon(dataSeries.GdiFill, points.ToArray());
+            this.bitmapGenerator.FillSeries(dataSeries, points, _size);
         }
 
         /// <summary>
@@ -350,18 +325,12 @@ namespace RealTimeGraphX.WPF
         /// </summary>
         public void EndDraw()
         {
-            _writeable_bitmap.AddDirtyRect(new Int32Rect(0, 0, _writeable_bitmap.PixelWidth, _writeable_bitmap.PixelHeight));
-            _writeable_bitmap.Unlock();
+            BitmapSource frame = this.bitmapGenerator.EndDraw();
 
-            var cloned = _writeable_bitmap.Clone();
-            cloned.Freeze();
-
-            Dispatcher.BeginInvoke(new Action((() =>
+            Dispatcher.BeginInvoke(new Action(() =>
             {
-                Image = cloned;
-            })));
-
-            _g.Dispose();
+                Image = frame;
+            }));
         }
 
         /// <summary>

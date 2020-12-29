@@ -53,6 +53,8 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Generators\GdiGenerator.cs" />
+    <Compile Include="IBitmapGenerator.cs" />
     <Compile Include="WpfGraphAxisControl.cs" />
     <Compile Include="WpfGraphAxisPanel.cs" />
     <Compile Include="WpfGraphAxisTickData.cs" />
