@@ -96,7 +96,8 @@ namespace RealTimeGraphX.WPF
         {
             SizeChanged += WpfGraphSurface_SizeChanged;
 
-            this.bitmapGenerator = new Generators.GdiGenerator();
+            this.bitmapGenerator = new Generators.WpfGenerator();
+            //this.bitmapGenerator = new Generators.GdiGenerator();
         }
 
         #endregion
