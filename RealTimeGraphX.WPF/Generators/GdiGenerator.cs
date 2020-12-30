@@ -7,6 +7,7 @@ using System.Text;
 
 namespace RealTimeGraphX.WPF.Generators
 {
+    /*
     internal class GdiGenerator : IBitmapGenerator
     {
         private System.Windows.Media.Imaging.WriteableBitmap _writeable_bitmap;
@@ -144,4 +145,5 @@ namespace RealTimeGraphX.WPF.Generators
             }
         }
     }
+    */
 }

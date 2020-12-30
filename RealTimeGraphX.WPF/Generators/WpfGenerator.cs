@@ -34,22 +34,11 @@ namespace RealTimeGraphX.WPF.Generators
 
         public void DrawSeries(WpfGraphDataSeries dataSeries, IEnumerable<System.Drawing.PointF> points)
         {
+            Geometry pathGeometry = CreatePath(points, closePath: false);
+
             Pen pen = GetPen(dataSeries);
 
-            IEnumerable<Point> wpfPoints = points.Select(x => new Point(x.X, x.Y));
-
-            Point start = wpfPoints.FirstOrDefault();
-            List<LineSegment> segments = new List<LineSegment>();
-
-            foreach (Point other in wpfPoints.Skip(1))
-            {
-                segments.Add(new LineSegment(other, true));
-            }
-            PathFigure figure = new PathFigure(start, segments, false); //true if closed
-            PathGeometry geometry = new PathGeometry();
-            geometry.Figures.Add(figure);
-
-            context.DrawGeometry(Brushes.Transparent, pen, geometry);
+            context.DrawGeometry(Brushes.Transparent, pen, pathGeometry);
         }
 
         public BitmapSource EndDraw()
@@ -66,7 +55,15 @@ namespace RealTimeGraphX.WPF.Generators
 
         public void FillSeries(WpfGraphDataSeries dataSeries, IEnumerable<System.Drawing.PointF> points, System.Drawing.SizeF size)
         {
-            // TODO
+            Geometry pathGeometry = CreatePath(points, closePath: true);
+
+            Brush brush = dataSeries.Fill;
+
+            // TODO: scale transform the gradient (brush)
+            //    gradient.ResetTransform();
+            //    gradient.ScaleTransform(size.Width / gradient.Rectangle.Width, size.Height / gradient.Rectangle.Height);
+
+            this.context.DrawGeometry(brush, new Pen(), pathGeometry);
         }
 
         public void SetTransform(GraphTransform transform)
@@ -82,6 +79,24 @@ namespace RealTimeGraphX.WPF.Generators
         {
             SolidColorBrush brush = new SolidColorBrush(dataSeries.Stroke);
             return new Pen(brush, dataSeries.StrokeThickness);
+        }
+
+        private PathGeometry CreatePath(IEnumerable<System.Drawing.PointF> points, bool closePath)
+        {
+            IEnumerable<Point> wpfPoints = points.ToWpfPoints();
+
+            Point start = wpfPoints.FirstOrDefault();
+
+            IList<LineSegment> segments = wpfPoints
+                .Skip(1)
+                .Select(s => new LineSegment(s, true))
+                .ToList();
+
+            PathFigure figure = new PathFigure(start, segments, closed: closePath); // true if closed
+            PathGeometry geometry = new PathGeometry();
+            geometry.Figures.Add(figure);
+
+            return geometry;
         }
     }
 }

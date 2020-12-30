@@ -75,7 +75,8 @@ namespace RealTimeGraphX.WPF.Demo
             {
                 while (true)
                 {
-                    var y = System.Windows.Forms.Cursor.Position.Y;
+                    //var y = System.Windows.Forms.Cursor.Position.Y;
+                    var y = new Random().NextDouble();
 
                     List<DoubleDataPoint> yy = new List<DoubleDataPoint>()
                     {

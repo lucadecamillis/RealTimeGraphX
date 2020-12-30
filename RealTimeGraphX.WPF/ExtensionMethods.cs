@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 
 namespace RealTimeGraphX.WPF
 {
@@ -25,6 +27,21 @@ namespace RealTimeGraphX.WPF
         internal static bool IsInDesignMode(this System.Windows.DependencyObject obj)
         {
             return (DesignerProperties.GetIsInDesignMode(obj));
+        }
+
+        /// <summary>
+        /// Stream a list of gdi points into a list of WPF points
+        /// </summary>
+        /// <param name="gdiPoints"></param>
+        /// <returns></returns>
+        internal static IEnumerable<System.Windows.Point> ToWpfPoints(this IEnumerable<System.Drawing.PointF> gdiPoints)
+        {
+            if (gdiPoints == null)
+            {
+                return Enumerable.Empty<System.Windows.Point>();
+            }
+
+            return gdiPoints.Select(p => new System.Windows.Point(x: p.X, y: p.Y));
         }
     }
 }
