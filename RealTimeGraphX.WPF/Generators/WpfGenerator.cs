@@ -34,6 +34,12 @@ namespace RealTimeGraphX.WPF.Generators
 
         public void DrawSeries(WpfGraphDataSeries dataSeries, IEnumerable<System.Drawing.PointF> points)
         {
+            if(dataSeries.UseFill)
+            {
+                // Handled by FillSeries
+                return;
+            }
+
             Geometry pathGeometry = CreatePath(points, closePath: false);
 
             Pen pen = GetPen(dataSeries);
@@ -55,15 +61,16 @@ namespace RealTimeGraphX.WPF.Generators
 
         public void FillSeries(WpfGraphDataSeries dataSeries, IEnumerable<System.Drawing.PointF> points, System.Drawing.SizeF size)
         {
-            Geometry pathGeometry = CreatePath(points, closePath: true);
+            Geometry pathGeometry = CreatePath(points, closePath: false);
 
-            Brush brush = dataSeries.Fill;
+            Pen pen = GetPen(dataSeries);
+            Brush brush = new SolidColorBrush(dataSeries.Fill);
 
             // TODO: scale transform the gradient (brush)
             //    gradient.ResetTransform();
             //    gradient.ScaleTransform(size.Width / gradient.Rectangle.Width, size.Height / gradient.Rectangle.Height);
 
-            this.context.DrawGeometry(brush, new Pen(), pathGeometry);
+            this.context.DrawGeometry(brush, pen, pathGeometry);
         }
 
         public void SetTransform(GraphTransform transform)

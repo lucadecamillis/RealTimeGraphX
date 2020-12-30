@@ -19,12 +19,16 @@
         </collections:ArrayList>
 
         <collections:ArrayList x:Key="brushes">
-            <SolidColorBrush Color="Transparent"></SolidColorBrush>
+            <Color>Transparent</Color>
+            <Color>#861E90FF</Color>
+            <Color>#86FF0000</Color>
+            
+            <!--<SolidColorBrush Color="Transparent"></SolidColorBrush>
             <SolidColorBrush Color="#861E90FF"></SolidColorBrush>
             <LinearGradientBrush>
                 <GradientStop Offset="0" Color="#86FF0000" />
                 <GradientStop Offset="1" Color="#80FFFF00" />
-            </LinearGradientBrush>
+            </LinearGradientBrush>-->
         </collections:ArrayList>
     </Window.Resources>
 

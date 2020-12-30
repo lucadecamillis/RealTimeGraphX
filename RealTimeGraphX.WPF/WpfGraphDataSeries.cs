@@ -60,11 +60,11 @@ namespace RealTimeGraphX.WPF
             }
         }
 
-        private Brush _fill;
+        private Color _fill;
         /// <summary>
         /// Gets or sets the series fill brush.
         /// </summary>
-        public Brush Fill
+        public Color Fill
         {
             get { return _fill; }
             set
